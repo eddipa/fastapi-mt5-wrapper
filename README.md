@@ -18,9 +18,7 @@ A FastAPI-based wrapper to interact with MetaTrader 5 (MT5) using Python. This p
 ## 🛠️ Requirements
 
 - Python 3.8+
-- MetaTrader 5 (must be installed and logged in)
-- Windows OS (MT5 is Windows-only)
-- A running MT5 terminal (same architecture as your Python interpreter: 32-bit or 64-bit)
+- MetaTrader 5 
 
 ---
 
