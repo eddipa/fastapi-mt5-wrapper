@@ -43,7 +43,7 @@ Ensure MetaTrader 5 is installed and **logged in** before starting the app. You 
 ## ▶️ Running the API
 
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
 Visit the interactive API docs at:  
