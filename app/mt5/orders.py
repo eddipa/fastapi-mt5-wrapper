@@ -76,8 +76,8 @@ def send_request(symbol: str,
         "deviation": deviation,
         "magic": magic,
         "comment": comment,
-        "type_time": mt5.ORDER_TIME_GTC,
-        "type_filling": mt5.ORDER_FILLING_RETURN,
+        "type_time": type_time,
+        "type_filling": type_filling,
     }
 
     result = mt5.order_send(request)
