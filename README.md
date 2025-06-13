@@ -53,21 +53,6 @@ Visit the interactive API docs at:
 
 ---
 
-## 📚 API Endpoints
-
-Here are a few example endpoints:
-
-- **GET** `/account/` → Retrieve account summary
-- **GET** `/positions/` → All open positions
-- **GET** `/positions/{symbol}` → Positions for a specific symbol
-- **GET** `/position/{ticket}` → Single open position by ticket
-- **GET** `/market/symbols/` → All available market symbols
-- **GET** `/history/` → Historical OHLC data for a symbol
-- **POST** `/trade/open/` → Open a new position
-- **POST** `/trade/close/` → Close an open position
-
-Full Swagger docs are available at `/docs`.
-
 ---
 
 ## 🧪 Testing
@@ -82,30 +67,6 @@ Or use [Postman](https://www.postman.com/) or Swagger UI for quick testing.
 
 ---
 
-## 📁 Project Structure
-
-```
-mt5-fastapi-wrapper/
-│
-├── app/
-│   ├── mt5/
-│   │   ├── connection.py
-│   │   ├── account.py
-│   │   ├── market.py
-│   │   ├── trading.py
-│   │   └── history.py
-│   └── routers/
-│       ├── account.py
-│       ├── market.py
-│       ├── trading.py
-│       └── history.py
-│
-├── main.py
-├── requirements.txt
-└── README.md
-```
-
----
 
 ## 🪪 License
 
