@@ -14,6 +14,6 @@ Examples of behavior that contributes to a positive environment:
 
 ## Enforcement
 
-Instances of abusive behavior may be reported to the project maintainer at **eddipa.dev@gmail.com**. All complaints will be reviewed and investigated.
+Instances of abusive behavior may be reported to the project maintainer. All complaints will be reviewed and investigated.
 
 This Code of Conduct is adapted from the Contributor Covenant, version 2.1.
