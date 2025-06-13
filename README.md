@@ -79,9 +79,3 @@ This project is licensed under the [MIT License](LICENSE).
 Contributions are welcome! Please open issues and submit pull requests to suggest new features, improvements, or bug fixes.
 
 ---
-
-## 👤 Author
-
-**Masoud Koochak**  
-Backend Developer | Algo-Trading Enthusiast  
-📧 eddipa.dev@gmail.com
