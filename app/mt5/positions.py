@@ -16,27 +16,7 @@ def get_open_positions_from_symbol(symbol: str):
 
     for counter, p in enumerate(positions):
         position = p._asdict()
-        positions_dict[counter] = {
-            "ticket"            : position["ticket"],
-            "time"              : position["time"],
-            "time_msc"          : position["time_msc"],
-            "time_update"       : position["time_update"],
-            "time_update_msc"   : position["time_update_msc"],
-            "type"              : position["type"],
-            "magic"             : position["magic"],
-            "identifier"        : position["identifier"],
-            "reason"            : position["reason"],
-            "volume"            : position["volume"],
-            "price_open"        : position["price_open"],
-            "sl"                : position["sl"],
-            "tp"                : position["tp"],
-            "price_current"     : position["price_current"],
-            "swap"              : position["swap"],
-            "profit"            : position["profit"],
-            "symbol"            : position["symbol"],
-            "comment"           : position["comment"],
-            "external_id"       : position["external_id"]
-        }    
+        positions_dict[counter] = position
 
     return {
         "open_positions_count": len(positions),
@@ -52,27 +32,7 @@ def get_open_positions_by_group(group: str):
 
     for counter, p in enumerate(positions):
         position = p._asdict()
-        positions_dict[counter] = {
-            "ticket"            : position["ticket"],
-            "time"              : position["time"],
-            "time_msc"          : position["time_msc"],
-            "time_update"       : position["time_update"],
-            "time_update_msc"   : position["time_update_msc"],
-            "type"              : position["type"],
-            "magic"             : position["magic"],
-            "identifier"        : position["identifier"],
-            "reason"            : position["reason"],
-            "volume"            : position["volume"],
-            "price_open"        : position["price_open"],
-            "sl"                : position["sl"],
-            "tp"                : position["tp"],
-            "price_current"     : position["price_current"],
-            "swap"              : position["swap"],
-            "profit"            : position["profit"],
-            "symbol"            : position["symbol"],
-            "comment"           : position["comment"],
-            "external_id"       : position["external_id"]
-        }    
+        positions_dict[counter] = position
 
     return {
         "open_positions_count": len(positions),

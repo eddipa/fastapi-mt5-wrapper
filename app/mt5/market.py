@@ -13,9 +13,19 @@ def get_symbol_info(symbol: str):
     info = mt5.symbol_info(symbol)
     return info._asdict() if info else None
 
+
 def get_tick(symbol: str):
     tick = mt5.symbol_info_tick(symbol)
     return tick._asdict() if tick else None
 
 def select_symbol(symbol: str) -> bool:
-    return mt5.symbol_select(symbol, True)
+    symbol_info = get_symbol_info(symbol)
+    # if the symbol is unavailable in MarketWatch, add it
+    if not symbol_info.visible:
+        print(symbol, "is not visible, trying to switch on")
+        sym_select = mt5.symbol_select(symbol,True)
+        if not sym_select:
+            print("symbol_select({}}) failed, exit",symbol)
+            return False
+
+    return sym_select
