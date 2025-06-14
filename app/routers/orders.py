@@ -1,4 +1,6 @@
 from fastapi import APIRouter, HTTPException
+
+import MetaTrader5 as mt5
 from app.mt5 import orders
 
 router = APIRouter()
