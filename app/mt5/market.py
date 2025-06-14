@@ -1,31 +1,16 @@
 from datetime import datetime
-from enum import Enum
 
-from fastapi import Query
 import MetaTrader5 as mt5
 
+def get_book(symbol:str):
+    if not mt5.market_book_add(symbol):
+        return None
 
-def get_all_symbols():
-    symbols = mt5.symbols_get()
-    return [s._asdict() for s in symbols] if symbols else None
+    book = mt5.market_book_get(symbol)
 
-def get_symbol_info(symbol: str):
-    info = mt5.symbol_info(symbol)
-    return info._asdict() if info else None
+    mt5.market_book_release(symbol)
 
+    if book is None:
+        return None
 
-def get_tick(symbol: str):
-    tick = mt5.symbol_info_tick(symbol)
-    return tick._asdict() if tick else None
-
-def select_symbol(symbol: str) -> bool:
-    symbol_info = get_symbol_info(symbol)
-    # if the symbol is unavailable in MarketWatch, add it
-    if not symbol_info.visible:
-        print(symbol, "is not visible, trying to switch on")
-        sym_select = mt5.symbol_select(symbol,True)
-        if not sym_select:
-            print("symbol_select({}}) failed, exit",symbol)
-            return False
-
-    return sym_select
+    return book

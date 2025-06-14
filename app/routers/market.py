@@ -1,32 +1,27 @@
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import JSONResponse
+
 import app.mt5.market as market
+
 
 router = APIRouter()
 
-@router.get("/symbols")
-def all_symbols():
-    data = market.get_all_symbols()
-    if not data:
-        raise HTTPException(status_code=500, detail="Failed to fetch symbols")
-    return data
+@router.post("/book/{symbol}/get")
+def get_market_book(symbol: str):
+    book = market.get_book(symbol)
 
-@router.get("/symbols/{symbol}")
-def symbol_info(symbol: str):
-    data = market.get_symbol_info(symbol)
-    if not data:
-        raise HTTPException(status_code=404, detail=f"Symbol '{symbol}' not found")
-    return data
+    if book is None:
+        return JSONResponse(status_code=404, content={"success": False, "message": f"No market book data for {symbol}"})
 
-@router.get("/price/{symbol}")
-def tick_info(symbol: str):
-    tick = market.get_tick(symbol)
-    if not tick:
-        raise HTTPException(status_code=404, detail=f"No tick data for {symbol}")
-    return tick
+    book_data = [entry._asdict() for entry in book]
+    return JSONResponse(content={"success": True, "symbol": symbol, "book": book_data})
 
-@router.post("/symbols/select")
-def select(symbol: str):
-    if not market.select_symbol(symbol):
-        raise HTTPException(status_code=500, detail=f"Failed to select {symbol}")
-    return {"message": f"Symbol {symbol} selected"}
+@router.get("/book/{symbol}/preview")
+def preview_book(symbol: str):
+    book = market.get_book(symbol)
+
+    if book is None:
+        raise HTTPException(status_code=404, detail="No market book data")
+
+    return [entry._asdict() for entry in book]
