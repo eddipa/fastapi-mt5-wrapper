@@ -11,21 +11,21 @@ def all_symbols():
         raise HTTPException(status_code=500, detail="Failed to fetch symbols")
     return data
 
-@router.get("/symbols/{symbol}")
+@router.get("/{symbol}")
 def symbol_info(symbol: str):
     data = symbols.get_symbol_info(symbol)
     if not data:
         raise HTTPException(status_code=404, detail=f"Symbol '{symbol}' not found")
     return data
 
-@router.get("/symbols/{symbol}/tick")
+@router.get("/{symbol}/tick")
 def symbol_info_tick(symbol: str):
     data = symbols.get_symbol_info_tick(symbol)
     if not data:
         raise HTTPException(status_code=404, detail=f"Symbol '{symbol}' or TICK not found")
     return data
 
-@router.post("/symbols/{symbol}/select")
+@router.post("/{symbol}/select")
 def select(symbol: str):
     if not symbols.select_symbol(symbol):
         raise HTTPException(status_code=500, detail=f"Failed to select {symbol}")
