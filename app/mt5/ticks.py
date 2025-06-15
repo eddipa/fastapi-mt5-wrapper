@@ -13,6 +13,8 @@ TICK_FLAG_MAP = {
 def get_ticks_from(symbol: str, from_datetime: datetime, count: int, flags: int):
     if not mt5.initialize():
         return None
+    
+    mt5.symbol_select(symbol)
 
     tick_flag = TICK_FLAG_MAP.get(flags)
     if tick_flag is None:
@@ -42,6 +44,8 @@ def get_ticks_from(symbol: str, from_datetime: datetime, count: int, flags: int)
 def get_ticks_range(symbol: str, from_datetime: datetime, to_datetime: datetime, flags: int):
     if not mt5.initialize():
         return None
+    
+    mt5.symbol_select(symbol)
         
     tick_flag = TICK_FLAG_MAP.get(flags)
     if tick_flag is None:

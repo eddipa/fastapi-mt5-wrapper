@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.mt5.connection import initialize_mt5, shutdown_mt5
-from app.routers import account, terminal, symbols, market, rates, ticks, positions, orders, trading, history
+from app.routers import account, terminal, symbols, market, rates, ticks, positions, orders, history
 
 app = FastAPI()
 
