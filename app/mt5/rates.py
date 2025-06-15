@@ -19,7 +19,14 @@ def get_rates(symbol: str, timeframe: int, from_datetime: datetime, count: int):
     if not mt5.initialize():
         return None
 
-    rates = mt5.copy_rates_from(symbol, timeframe, from_datetime, count)
+    mt5.symbol_select(symbol)
+    
+    tf = TIMEFRAME_MAP.get(timeframe)
+    if tf is None:
+        print(f"Invalid timeframe: {timeframe}")
+        return None
+
+    rates = mt5.copy_rates_from(symbol, tf, from_datetime, count)
 
     if rates is None or len(rates) == 0:
         return None
@@ -43,6 +50,8 @@ def get_rates(symbol: str, timeframe: int, from_datetime: datetime, count: int):
 def get_rates_from_pos(symbol: str, timeframe: int, start_pos: int, count: int):
     if not mt5.initialize():
         return None
+
+    mt5.symbol_select(symbol)
 
     tf = TIMEFRAME_MAP.get(timeframe)
     if tf is None:
@@ -72,6 +81,8 @@ def get_rates_from_pos(symbol: str, timeframe: int, start_pos: int, count: int):
 def get_rates_range(symbol: str, timeframe: int, from_datetime: datetime, to_datetime: datetime):
     if not mt5.initialize():
         return None
+    
+    mt5.symbol_select(symbol)
 
     tf = TIMEFRAME_MAP.get(timeframe)
     if tf is None:
