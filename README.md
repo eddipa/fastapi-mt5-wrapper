@@ -74,7 +74,7 @@ python -m unittest discover tests/
 ```
 Or run a specific test file:
 ```bash
-python -m unittest tests/test_trade_service.py
+python -m unittest tests/test_services_trade_service.py
 ```
 Requirements:
 
