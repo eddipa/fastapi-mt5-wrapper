@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.mt5.connection import initialize_mt5, shutdown_mt5
-from app.routers import account, terminal, symbols, market, rates, ticks, positions, orders, history
+from app.routers import account, terminal, symbols, market, rates, ticks, positions, orders, history, services
 
 app = FastAPI()
 
@@ -22,3 +22,4 @@ app.include_router(ticks.router, prefix="/ticks")
 app.include_router(orders.router, prefix="/orders")
 app.include_router(positions.router, prefix="/positions")
 app.include_router(history.router, prefix="/history")
+app.include_router(services.router, prefix="/services")
