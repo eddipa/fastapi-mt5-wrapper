@@ -6,15 +6,37 @@ logger = logging.getLogger("mt5_trade_service")
 
 
 class TradeService:
+    """
+    A Python wrapper around MetaTrader 5 trade functions, inspired by MQL5's CTrade class.
+    Provides methods to execute market orders, place pending orders, close positions, and modify orders.
+    """
+
     def __init__(self):
+        """
+        Initializes the MT5 connection when the service is instantiated.
+        """
         if not mt5.initialize():
             raise RuntimeError("Failed to initialize MetaTrader 5")
 
     def _check_connection(self):
+        """
+        Ensures MT5 is initialized before every trade operation.
+        Raises:
+            HTTPException: If connection to MT5 fails.
+        """
         if not mt5.initialize():
             raise HTTPException(status_code=500, detail="MT5 connection failed")
 
     def _validate_symbol(self, symbol: str):
+        """
+        Validates if the symbol exists, is visible, and is tradable.
+        Args:
+            symbol (str): The trading symbol to validate (e.g., 'EURUSD').
+        Raises:
+            HTTPException: If the symbol is invalid or not tradable.
+        Returns:
+            SymbolInfo: The validated symbol info object.
+        """
         info = mt5.symbol_info(symbol)
         if info is None:
             raise HTTPException(status_code=400, detail=f"Symbol '{symbol}' not found")
@@ -29,6 +51,13 @@ class TradeService:
         return info
 
     def _retcode_meaning(self, retcode: int) -> str:
+        """
+        Maps MT5 return codes to human-readable explanations.
+        Args:
+            retcode (int): MT5 return code.
+        Returns:
+            str: Explanation of the return code.
+        """
         return {
             mt5.TRADE_RETCODE_DONE: "Done",
             mt5.TRADE_RETCODE_REQUOTE: "Requote",
@@ -44,6 +73,13 @@ class TradeService:
         }.get(retcode, "Unknown error")
 
     def _handle_result(self, result):
+        """
+        Handles the result of an MT5 order_send() call.
+        Raises:
+            HTTPException: If trade execution failed.
+        Returns:
+            dict: Structured response from the trade operation.
+        """
         if result is None:
             raise HTTPException(status_code=500, detail="No response from MT5")
 
@@ -64,6 +100,9 @@ class TradeService:
     # === Market Orders ===
 
     def buy(self, symbol: str, volume: float, sl=None, tp=None, deviation=10, magic=0):
+        """
+        Executes a market buy order.
+        """
         self._check_connection()
         self._validate_symbol(symbol)
         price = mt5.symbol_info_tick(symbol).ask
@@ -85,6 +124,9 @@ class TradeService:
         return self._handle_result(mt5.order_send(request))
 
     def sell(self, symbol: str, volume: float, sl=None, tp=None, deviation=10, magic=0):
+        """
+        Executes a market sell order.
+        """
         self._check_connection()
         self._validate_symbol(symbol)
         price = mt5.symbol_info_tick(symbol).bid
@@ -108,6 +150,9 @@ class TradeService:
     # === Pending Orders ===
 
     def buy_limit(self, symbol: str, volume: float, price: float, sl=None, tp=None, deviation=10, magic=0):
+        """
+        Places a Buy Limit order at a specified price.
+        """
         self._check_connection()
         self._validate_symbol(symbol)
 
@@ -128,6 +173,9 @@ class TradeService:
         return self._handle_result(mt5.order_send(request))
 
     def sell_limit(self, symbol: str, volume: float, price: float, sl=None, tp=None, deviation=10, magic=0):
+        """
+        Places a Sell Limit order at a specified price.
+        """
         self._check_connection()
         self._validate_symbol(symbol)
 
@@ -148,6 +196,9 @@ class TradeService:
         return self._handle_result(mt5.order_send(request))
 
     def buy_stop(self, symbol: str, volume: float, price: float, sl=None, tp=None, deviation=10, magic=0):
+        """
+        Places a Buy Stop order above the current price.
+        """
         self._check_connection()
         self._validate_symbol(symbol)
 
@@ -168,6 +219,9 @@ class TradeService:
         return self._handle_result(mt5.order_send(request))
 
     def sell_stop(self, symbol: str, volume: float, price: float, sl=None, tp=None, deviation=10, magic=0):
+        """
+        Places a Sell Stop order below the current price.
+        """
         self._check_connection()
         self._validate_symbol(symbol)
 
@@ -187,9 +241,16 @@ class TradeService:
 
         return self._handle_result(mt5.order_send(request))
 
-    # === Position & Order Actions ===
+    # === Close / Modify ===
 
     def close_position(self, ticket: int):
+        """
+        Closes an open position by ticket ID.
+        Args:
+            ticket (int): The position ticket to close.
+        Returns:
+            dict: Result of the close operation.
+        """
         self._check_connection()
         position = mt5.positions_get(ticket=ticket)
         if not position:
@@ -216,6 +277,16 @@ class TradeService:
         return self._handle_result(mt5.order_send(request))
 
     def modify_order(self, order_id: int, new_price: float, new_sl=None, new_tp=None):
+        """
+        Modifies a pending order (price, SL/TP).
+        Args:
+            order_id (int): The ticket of the order to modify.
+            new_price (float): New desired order price.
+            new_sl (float, optional): New Stop Loss price.
+            new_tp (float, optional): New Take Profit price.
+        Returns:
+            dict: Result of the modification.
+        """
         self._check_connection()
         order = mt5.orders_get(ticket=order_id)
         if not order:
