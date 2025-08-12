@@ -1,45 +1,9 @@
 import MetaTrader5 as mt5
 
-
-RET_CODE_MAP = {
-    0: "Request executed successfully",
-    1: "Request executed partially",
-    10004: "Trade server busy",
-    10006: "No connection to trade server",
-    10007: "Operation is allowed only for live accounts",
-    10008: "Request processing timeout",
-    10009: "Invalid request",
-    10010: "Invalid volume",
-    10011: "Invalid price",
-    10012: "Invalid stop",
-    10013: "Trade is disabled",
-    10014: "Market is closed",
-    10015: "Trade timeout",
-    10016: "Invalid order",
-    10017: "Trade context busy",
-    10018: "Trade expiration denied",
-    10019: "Too many requests",
-    10020: "Order not found",
-    10021: "Unknown symbol",
-    10022: "Server busy",
-    10023: "Trade modification failed",
-    10024: "Too frequent requests",
-    10025: "Order locked",
-    10026: "Long positions only allowed",
-    10027: "Too many pending orders",
-    10028: "Hedge is prohibited",
-    10029: "Close by orders prohibited"
-    # Add more as needed from MT5 docs
-}
-
-def parse_order_retcode(retcode: int) -> str:
-    return RET_CODE_MAP.get(retcode, "Unknown retcode")
-
-
-def get_orders():
-    orders = mt5.orders_total() or 0
+def get_open_orders():
+    orders = mt5.orders_total() or []
     return {
-        "orders_count": orders
+        "open_orders_count": len(orders),
     }
 
 def get_open_orders_from_symbol(symbol: str):
@@ -79,80 +43,44 @@ def get_open_order_by_ticket(ticket: int):
     else:
         return {"error": f"No order found for ticket {ticket}"}
 
-def calc_margin(action: int, symbol: str, volume: float, price: float = None):
-    if not mt5.initialize():
-        return None, "Failed to initialize MT5"
+def send_order(symbol: str, 
+            order_type: int, volume: float, 
+            sl_points: int = 0, tp_points: int = 0, 
+            deviation: int = 10, 
+            type_time: int = mt5.ORDER_TIME_GTC, 
+            type_filling: int = mt5.ORDER_FILLING_RETURN, 
+            comment : str = "", magic: int = 12345):
+    symbol_info = mt5.symbol_info(symbol)
+    if symbol_info is None or not symbol_info.visible:
+        raise ValueError(f"Symbol {symbol} not found or not visible.")
 
-    mt5.symbol_select(symbol)
+    tick = mt5.symbol_info_tick(symbol)
+    point = symbol_info.point
+    price = tick.ask if order_type == mt5.ORDER_TYPE_BUY else tick.bid # todo: implement other types
 
-    # Auto-fetch price if not provided
-    if price is None:
-        tick = mt5.symbol_info_tick(symbol)
-        if tick is None:
-            return None, "Failed to fetch current price"
-        if action == mt5.ORDER_TYPE_BUY:
-            price = tick.ask
-        elif action == mt5.ORDER_TYPE_SELL:
-            price = tick.bid
-        else:
-            return None, "Unsupported action for price inference"
+    if order_type == mt5.ORDER_TYPE_BUY:
+        sl = price - sl_points * point if sl_points != 0 else 0
+        tp = price + tp_points * point if tp_points != 0 else 0
+    else:
+        sl = price + sl_points * point if sl_points != 0 else 0
+        tp = price - tp_points * point if tp_points != 0 else 0
 
-    margin = mt5.order_calc_margin(action, symbol, volume, price)
-
-    if margin is None:
-        return None, "MT5 could not calculate margin"
-
-    return margin, None
-
-def calc_profit(action: int, symbol: str, volume: float, price_open: float, price_close: float):
-    if not mt5.initialize():
-        return None, "Failed to initialize MT5"
-
-    mt5.symbol_select(symbol)
-
-    profit = mt5.order_calc_profit(action, symbol, volume, price_open, price_close)
-
-    if profit is None:
-        return None, "MT5 could not calculate profit"
-
-    return profit, None
-
-def order_check(request: dict):
-    if not mt5.initialize():
-        return None, "Failed to initialize MT5"
-
-    mt5.symbol_select(request.get("symbol"))
-
-    result = mt5.order_check(request)
-
-    if result is None:
-        return None, "MT5 could not validate the order"
-
-    result_dict = result._asdict()
-    if hasattr(result, "request") and result.request:
-        result_dict["request"] = result.request._asdict()
-
-    return result_dict, None
-
-def order_send(request: dict):
-    if not mt5.initialize():
-        return None, "Failed to initialize MT5"
-
-    mt5.symbol_select(request.get("symbol"))
-
-    # Auto-fill price if missing 
-    if not request.get("price"):
-        tick = mt5.symbol_info_tick(request.get("symbol"))
-        if not tick:
-            return None, "Failed to fetch symbol price"
+    request = {
+        "action": mt5.TRADE_ACTION_DEAL,
+        "symbol": symbol,
+        "volume": volume,
+        "type": order_type,
+        "price": price,
+        "sl": sl,
+        "tp": tp,
+        "deviation": deviation,
+        "magic": magic,
+        "comment": comment,
+        "type_time": mt5.ORDER_TIME_GTC,
+        "type_filling": mt5.ORDER_FILLING_RETURN,
+    }
 
     result = mt5.order_send(request)
+    return result._asdict() if result is not None else {"error": "No response from MT5"}
 
-    if result is None:
-        return None, "Order send failed: no result returned"
-    
-    result_dict = result._asdict()
-    if hasattr(result, "request") and result.request:
-        result_dict["request"] = result.request._asdict()
 
-    return result_dict, None
