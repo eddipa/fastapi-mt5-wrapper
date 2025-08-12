@@ -63,6 +63,27 @@ curl "http://127.0.0.1:8000/account/"
 
 Or use [Postman](https://www.postman.com/) or Swagger UI for quick testing.
 
+🔹 Automated Testing
+
+Unit tests for this project are written using unittest with mock support.
+
+Run all tests:
+
+```bash
+python -m unittest discover tests/
+```
+Or run a specific test file:
+```bash
+python -m unittest tests/test_services_trade_service.py
+```
+Requirements:
+
+    Python ≥ 3.10
+
+    MetaTrader5 (mocked in tests)
+
+    No live MT5 account connection required during testing
+
 ---
 
 
