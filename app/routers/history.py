@@ -1,17 +1,23 @@
+from typing import Optional
 from fastapi import APIRouter, HTTPException, Query
 from datetime import datetime
 import app.mt5.history as history
 
 router = APIRouter()
 
+
 @router.get(
     "/orders/total/",
     summary="Get total historical orders",
-    response_description="Number of historical orders within the given time range"
+    response_description="Number of historical orders within the given time range",
 )
 def history_orders_total(
-    from_datetime: datetime = Query(..., description="Start datetime (ISO format, e.g. 2024-01-01T00:00:00)"),
-    to_datetime: datetime = Query(..., description="End datetime (ISO format, e.g. 2024-12-31T23:59:59)")
+    from_datetime: datetime = Query(
+        ..., description="Start datetime (ISO format, e.g. 2024-01-01T00:00:00)"
+    ),
+    to_datetime: datetime = Query(
+        ..., description="End datetime (ISO format, e.g. 2024-12-31T23:59:59)"
+    ),
 ):
     """
     Returns the total number of historical trade orders placed within a specified date range.
@@ -39,18 +45,25 @@ def history_orders_total(
         "success": True,
         "from": from_datetime.isoformat(),
         "to": to_datetime.isoformat(),
-        "order_count": total
+        "order_count": total,
     }
+
 
 @router.get(
     "/orders/",
     summary="Fetch historical trade orders",
-    response_description="A list of historical trade orders within the specified range and optional symbol group"
+    response_description="A list of historical trade orders within the specified range and optional symbol group",
 )
 def get_filtered_orders(
-    from_datetime: datetime = Query(..., description="Start datetime (ISO format, e.g. 2024-01-01T00:00:00)"),
-    to_datetime: datetime = Query(..., description="End datetime (ISO format, e.g. 2024-12-31T23:59:59)"),
-    group: Optional[str] = Query(None, description="Symbol group filter (e.g. '*BTC*', '*USD*')")
+    from_datetime: datetime = Query(
+        ..., description="Start datetime (ISO format, e.g. 2024-01-01T00:00:00)"
+    ),
+    to_datetime: datetime = Query(
+        ..., description="End datetime (ISO format, e.g. 2024-12-31T23:59:59)"
+    ),
+    group: Optional[str] = Query(
+        None, description="Symbol group filter (e.g. '*BTC*', '*USD*')"
+    ),
 ):
     """
     Fetches historical trade orders from MetaTrader 5 within a given time range.
@@ -84,13 +97,14 @@ def get_filtered_orders(
         "to": to_datetime.isoformat(),
         "group": group,
         "order_count": len(orders),
-        "orders": orders
+        "orders": orders,
     }
+
 
 @router.get(
     "/orders/{ticket}",
     summary="Get historical order by ticket",
-    response_description="Details of a specific historical order"
+    response_description="Details of a specific historical order",
 )
 def get_order_by_ticket(ticket: int):
     """
@@ -113,16 +127,13 @@ def get_order_by_ticket(ticket: int):
     if order is None:
         raise HTTPException(status_code=404, detail=error)
 
-    return {
-        "success": True,
-        "ticket": ticket,
-        "order": order
-    }
+    return {"success": True, "ticket": ticket, "order": order}
+
 
 @router.get(
     "/orders/position/{position_id}",
     summary="Get all orders linked to a position",
-    response_description="Historical orders associated with a given position ID"
+    response_description="Historical orders associated with a given position ID",
 )
 def get_orders_by_position(position_id: int):
     """
@@ -150,17 +161,22 @@ def get_orders_by_position(position_id: int):
         "success": True,
         "position_id": position_id,
         "order_count": len(orders),
-        "orders": orders
+        "orders": orders,
     }
+
 
 @router.get(
     "/deals/total/",
     summary="Get total number of historical deals",
-    response_description="Count of historical trade deals in the specified date range"
+    response_description="Count of historical trade deals in the specified date range",
 )
 def history_deals_total(
-    from_datetime: datetime = Query(..., description="Start datetime (ISO format, e.g. 2024-01-01T00:00:00)"),
-    to_datetime: datetime = Query(..., description="End datetime (ISO format, e.g. 2024-12-31T23:59:59)")
+    from_datetime: datetime = Query(
+        ..., description="Start datetime (ISO format, e.g. 2024-01-01T00:00:00)"
+    ),
+    to_datetime: datetime = Query(
+        ..., description="End datetime (ISO format, e.g. 2024-12-31T23:59:59)"
+    ),
 ):
     """
     Fetch the total number of historical trade deals within a specified time range from MetaTrader 5.
@@ -188,18 +204,25 @@ def history_deals_total(
         "success": True,
         "from": from_datetime.isoformat(),
         "to": to_datetime.isoformat(),
-        "deal_count": total
+        "deal_count": total,
     }
+
 
 @router.get(
     "/deals/group/",
     summary="Fetch historical deals by symbol group",
-    response_description="List of trade deals filtered by symbol group within a specified time range"
+    response_description="List of trade deals filtered by symbol group within a specified time range",
 )
 def get_filtered_deals(
-    from_datetime: datetime = Query(..., description="Start datetime (ISO format, e.g. 2024-01-01T00:00:00)"),
-    to_datetime: datetime = Query(..., description="End datetime (ISO format, e.g. 2024-12-31T23:59:59)"),
-    group: Optional[str] = Query(None, description="Symbol group filter (wildcards supported, e.g. '*BTC*')")
+    from_datetime: datetime = Query(
+        ..., description="Start datetime (ISO format, e.g. 2024-01-01T00:00:00)"
+    ),
+    to_datetime: datetime = Query(
+        ..., description="End datetime (ISO format, e.g. 2024-12-31T23:59:59)"
+    ),
+    group: Optional[str] = Query(
+        None, description="Symbol group filter (wildcards supported, e.g. '*BTC*')"
+    ),
 ):
     """
     Retrieve historical trade deals from MetaTrader 5 that occurred within a given time range,
@@ -233,13 +256,14 @@ def get_filtered_deals(
         "to": to_datetime.isoformat(),
         "group": group,
         "deal_count": len(deals),
-        "deals": deals
+        "deals": deals,
     }
+
 
 @router.get(
     "/deals/{ticket}",
     summary="Get historical deal by ticket",
-    response_description="Details of a specific trade deal"
+    response_description="Details of a specific trade deal",
 )
 def get_deal_by_ticket(ticket: int):
     """
@@ -262,16 +286,13 @@ def get_deal_by_ticket(ticket: int):
     if deal is None:
         raise HTTPException(status_code=404, detail=error)
 
-    return {
-        "success": True,
-        "ticket": ticket,
-        "deal": deal
-    }
+    return {"success": True, "ticket": ticket, "deal": deal}
+
 
 @router.get(
     "/deals/position/{position_id}",
     summary="Get historical deals for a position",
-    response_description="List of trade deals associated with a specific position ID"
+    response_description="List of trade deals associated with a specific position ID",
 )
 def get_deals_by_position(position_id: int):
     """
@@ -299,5 +320,5 @@ def get_deals_by_position(position_id: int):
         "success": True,
         "position_id": position_id,
         "deal_count": len(deals),
-        "deals": deals
+        "deals": deals,
     }
